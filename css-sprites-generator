@@ -1,0 +1,61 @@
+#!/bin/sh
+
+set -e
+
+# identify format variables https://imagemagick.org/script/escape.php
+
+# generate style
+
+HEIGTH_OFFSET=0
+
+STYLE_TEMPLATE=".$SPRITES_CLASS_PREFIX%t { background-position: 0 -\${HEIGTH_OFFSET}px; width: %wpx; height: %hpx; }"
+
+INCREMENT_HEIGTH_OFFSET_TEMPLATE="\$((\$HEIGTH_OFFSET + %h))"
+
+FINAL_STYLE_TEMPLATE="$(identify -format "echo \"$STYLE_TEMPLATE\"\nHEIGTH_OFFSET=${INCREMENT_HEIGTH_OFFSET_TEMPLATE}\n\n" $IMAGES_PATH_PATTERN)"
+
+if [ "$DEBUG_ENABLED" = "true" ]; then
+    printf "[DEBUG] Style template ---------------------------------------------------------------------------------------\n\n$FINAL_STYLE_TEMPLATE\n\n[DEBUG] Style template\n\n"
+fi
+
+rm -rf build/*
+
+echo ".$SPRITES_BASE_CLASS { background: url('$IMAGE_SPRITES_BASE_URL$IMAGE_SPRITES_FILENAME') no-repeat; }" > build/$STYLE_FILENAME
+eval "$FINAL_STYLE_TEMPLATE" >> build/$STYLE_FILENAME
+
+# generate sprite image
+
+convert $IMAGES_PATH_PATTERN -append $IMAGE_FORMAT:build/$IMAGE_SPRITES_FILENAME
+
+# generate example page
+
+printf "
+<!DOCTYPE html>
+<html>
+    <body>
+        $(identify -format "<div class=\"$SPRITES_BASE_CLASS $SPRITES_CLASS_PREFIX%t\"></div>\n        " $IMAGES_PATH_PATTERN)
+
+        <style>
+            /* only for example */
+            body {
+                display: flex;
+                flex-wrap: wrap;
+                max-width: 1280px;
+                margin: 50px auto;
+                justify-content: center;
+            }
+
+            body > div {
+                margin: 5px;
+                border: solid 4px;
+            }
+        </style>
+        <link href=\"$STYLE_FILENAME\" rel=\"stylesheet\" type=\"text/css\">
+    </body>
+</html>
+" > build/$EXAMPLE_FILENAME
+
+echo "[INFO] BUILD SUCCESS"
+echo "[INFO] Style file: $(pwd)/build/$STYLE_FILENAME"
+echo "[INFO] Sprite image file: $(pwd)/build/$IMAGE_SPRITES_FILENAME"
+echo "[INFO] Example page: $(pwd)/build/$EXAMPLE_FILENAME"
