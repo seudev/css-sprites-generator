@@ -13,6 +13,13 @@ This tool is made with Docker and Shell Script. Internally it use [ImageMagick](
 * [CSS Sprites: What They Are, Why They’re Cool, and How To Use Them](https://css-tricks.com/css-sprites)
 * [Implementing image sprites in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Images/Implementing_image_sprites_in_CSS)
 
+## Demo
+
+See the `demo` folder. The `demo/src/` folder contains the source images and the `demo/build` contains the generated files.
+
+* The total size of the ten images is *66.3 kB*, combining it the total size was reduced to *10.7 kB*. Aditionalty you can optimize the final image to reduce it even further.
+* The generated stylesheet file size is *784 bytes* (non minified).
+
 ## Using css-sprites-generator
 
 Put the desired images in a folder, then run the below command mapping the source images folder and build folder.
