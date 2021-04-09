@@ -4,7 +4,7 @@ LABEL vendor="Seudev" \
     homepage="http://docker-4dev.seudev.com" \
     author="Thomás Sousa Silva <thomassousa.dev>"
 
-RUN apk add --no-cache imagemagick \
+RUN apk add --no-cache imagemagick curl grep \
     && rm -rf /var/cache/apk/*
 
 COPY css-sprites-generator /usr/bin
@@ -22,5 +22,10 @@ ENV IMAGE_SPRITES_FILENAME=sprite-result.png
 ENV IMAGE_SPRITES_BASE_URL=
 ENV STYLE_FILENAME=style.css
 ENV EXAMPLE_FILENAME=example.html
+
+ENV OPTIMIZE_SPRITES_IMAGE=false
+ENV TINIFY_API_SHRINK_URL=https://api.tinify.com/shrink
+ENV TINIFY_API_KEY=
+ENV TINIFY_JSON_RESPONSE_FILE="tinify-response.json"
 
 CMD ["css-sprites-generator"]

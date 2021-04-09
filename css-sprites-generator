@@ -4,7 +4,9 @@ set -e
 
 # identify format variables https://imagemagick.org/script/escape.php
 
-# generate style
+# generate styles
+
+echo "[INFO] Generating CSS styles..."
 
 HEIGTH_OFFSET=0
 
@@ -25,9 +27,42 @@ eval "$FINAL_STYLE_TEMPLATE" >> build/$STYLE_FILENAME
 
 # generate sprite image
 
+echo "[INFO] Generating image sprites..."
+
 convert $IMAGES_PATH_PATTERN -append $IMAGE_FORMAT:build/$IMAGE_SPRITES_FILENAME
 
+# optimize image sprites
+
+if [ "$OPTIMIZE_SPRITES_IMAGE" = "true" ]; then
+
+    echo "[INFO] Optimizing image sprites..."
+
+    VERBOSE=$([ "$DEBUG_ENABLED" == "true" ] && echo "-v" || echo "-s")
+
+    echo "[INFO] Sending $IMAGE_SPRITES_FILENAME to $TINIFY_API_SHRINK_URL to optimize it..."
+
+    curl $VERBOSE \
+        --user $TINIFY_API_KEY \
+        --data-binary @build/$IMAGE_SPRITES_FILENAME \
+        --output build/$TINIFY_JSON_RESPONSE_FILE \
+        $TINIFY_API_SHRINK_URL
+
+    OPTIMIZED_IMAGE_URL="$(grep -oP '(?<="url":")[^"]*' build/$TINIFY_JSON_RESPONSE_FILE)" > /dev/null
+
+    mv build/$IMAGE_SPRITES_FILENAME build/not-optimized-$IMAGE_SPRITES_FILENAME
+
+    echo "[INFO] Downloading optimized image sprites $OPTIMIZED_IMAGE_URL..."
+
+    curl $VERBOSE \
+        --user $TINIFY_API_KEY \
+        --output build/$IMAGE_SPRITES_FILENAME \
+        $OPTIMIZED_IMAGE_URL > /dev/null
+
+fi
+
 # generate example page
+
+echo "[INFO] Generating example HTML page..."
 
 printf "
 <!DOCTYPE html>
