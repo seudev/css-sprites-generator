@@ -4,6 +4,23 @@ set -e
 
 # identify format variables https://imagemagick.org/script/escape.php
 
+echo "[INFO] CSS Sprites Generator"
+
+# count and log source images
+
+echo "[INFO] Source images: $IMAGES_PATH_PATTERN"
+
+TOTAL_SOURCE_IMAGES=0
+TOTAL_SOURCE_IMAGES_SIZE=0
+LOG_AND_COUNT_SOURCE_IMAGES_TEMPLATE=$(identify -format "echo \"[INFO] %f %w x %h pixels %B bytes\"\nTOTAL_SOURCE_IMAGES_SIZE=\$((\$TOTAL_SOURCE_IMAGES_SIZE + %B))\nTOTAL_SOURCE_IMAGES=\$((\$TOTAL_SOURCE_IMAGES + 1))\n\n" $IMAGES_PATH_PATTERN)
+
+if [ "$DEBUG_ENABLED" = "true" ]; then
+    printf "[DEBUG] Count source images ----------------------------------------------------------------------------------\n\n$LOG_AND_COUNT_SOURCE_IMAGES_TEMPLATE\n\n[DEBUG] Count source images\n\n"
+fi
+
+eval "$LOG_AND_COUNT_SOURCE_IMAGES_TEMPLATE"
+echo "[INFO] Total source images: $TOTAL_SOURCE_IMAGES ($TOTAL_SOURCE_IMAGES_SIZE bytes)"
+
 # generate styles
 
 echo "[INFO] Generating CSS styles..."
@@ -27,7 +44,7 @@ eval "$FINAL_STYLE_TEMPLATE" >> build/$STYLE_FILENAME
 
 # generate sprite image
 
-echo "[INFO] Generating image sprites..."
+echo "[INFO] Generating image sprites, using $IMAGE_FORMAT format..."
 
 convert $IMAGES_PATH_PATTERN -append $IMAGE_FORMAT:build/$IMAGE_SPRITES_FILENAME
 
@@ -49,7 +66,10 @@ if [ "$OPTIMIZE_IMAGE_SPRITES" = "true" ]; then
 
     OPTIMIZED_IMAGE_URL="$(grep -oP '(?<="url":")[^"]*' build/$TINIFY_JSON_RESPONSE_FILE)" > /dev/null
 
-    mv build/$IMAGE_SPRITES_FILENAME build/not-optimized-$IMAGE_SPRITES_FILENAME
+    NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME="not-optimized-$IMAGE_SPRITES_FILENAME"
+    echo "[INFO] Rename $IMAGE_SPRITES_FILENAME file to $NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME"
+
+    mv build/$IMAGE_SPRITES_FILENAME build/$NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME
 
     echo "[INFO] Downloading optimized image sprites $OPTIMIZED_IMAGE_URL..."
 
@@ -58,6 +78,8 @@ if [ "$OPTIMIZE_IMAGE_SPRITES" = "true" ]; then
         --output build/$IMAGE_SPRITES_FILENAME \
         $OPTIMIZED_IMAGE_URL > /dev/null
 
+else
+    NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME="$IMAGE_SPRITES_FILENAME"
 fi
 
 # generate example page
@@ -90,7 +112,19 @@ printf "
 </html>
 " > build/$EXAMPLE_FILENAME
 
-echo "[INFO] BUILD SUCCESS"
-echo "[INFO] Style file: $(pwd)/build/$STYLE_FILENAME"
-echo "[INFO] Sprite image file: $(pwd)/build/$IMAGE_SPRITES_FILENAME"
-echo "[INFO] Example page: $(pwd)/build/$EXAMPLE_FILENAME"
+NOT_OPTIMIZED_IMAGE_SPRITES_FILE_SIZE=$(identify -format "%B" build/$NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME)
+IMAGE_SPRITES_FILE_SIZE=$(identify -format "%B" build/$IMAGE_SPRITES_FILENAME)
+SIZE_NOT_OPTIMIZED_REDUCTION_PERCENTAGE=$(echo "scale=$PERCENTAGE_SCALE; (100 - (($NOT_OPTIMIZED_IMAGE_SPRITES_FILE_SIZE * 100) / $TOTAL_SOURCE_IMAGES_SIZE))" | bc)
+
+printf "[INFO] \033[1;32mBUILD SUCCESS\033[0m\n"
+echo "[INFO] Build path: $(pwd)/build"
+echo "[INFO] CSS Style file: $STYLE_FILENAME $(stat -c%s "build/$STYLE_FILENAME") bytes"
+echo "[INFO] Not optimized image sprites: $NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME $(identify -format "%w x %h pixels %B bytes ($SIZE_NOT_OPTIMIZED_REDUCTION_PERCENTAGE% reduction)" build/$NOT_OPTIMIZED_IMAGE_SPRITES_FILENAME)"
+
+if [ "$OPTIMIZE_IMAGE_SPRITES" = "true" ]; then
+    SIZE_REDUCTION_PERCENTAGE=$(echo "scale=$PERCENTAGE_SCALE; (100 - (($IMAGE_SPRITES_FILE_SIZE * 100) / $TOTAL_SOURCE_IMAGES_SIZE))" | bc)
+
+    echo "[INFO] Optimized image sprites: $IMAGE_SPRITES_FILENAME $(identify -format "%w x %h pixels %B bytes ($SIZE_REDUCTION_PERCENTAGE% reduction)" build/$IMAGE_SPRITES_FILENAME)"
+fi
+
+echo "[INFO] Example HTML page: $EXAMPLE_FILENAME"
