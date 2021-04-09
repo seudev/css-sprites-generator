@@ -1,7 +1,7 @@
 FROM alpine:3.13.4
 
 LABEL vendor="Seudev" \
-    homepage="http://docker-4dev.seudev.com" \
+    homepage="https://github.com/seudev/css-sprites-generator" \
     author="Thomás Sousa Silva <thomassousa.dev>"
 
 RUN apk add --no-cache imagemagick curl grep \
