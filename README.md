@@ -17,8 +17,10 @@ This tool is made with Docker and Shell Script. Internally it use [ImageMagick](
 
 See the `demo` folder. The `demo/src/` folder contains the source images and the `demo/build` contains the generated files.
 
-* The total size of the ten images is *66.3 kB*, combining it the total size was reduced to *10.7 kB* and after optimization is *3.8 kB*.
-* The generated stylesheet file size is *784 bytes* (non minified).
+* The total size of the ten images is *66316 bytes*, combining it the total size was reduced to *20216 bytes* (69.52% reduction) and after optimization is *4645 bytes* (93.00% reduction).
+* The generated stylesheet file size is *784 bytes* (not minified).
+
+![css-sprites-generator-demo](https://user-images.githubusercontent.com/8549602/114244063-274bf200-9964-11eb-8e02-b401b2f7be4c.png)
 
 ## Using css-sprites-generator
 
@@ -46,6 +48,7 @@ If necessary you can change the below variables. Pass it to the docker container
 | `IMAGE_SPRITES_BASE_URL`    |                                 | The base URL of the image sprites.                                                                                  |
 | `STYLE_FILENAME`            | `style.css`                     | The CSS filename.                                                                                                   |
 | `EXAMPLE_FILENAME`          | `example.html`                  | The filename of the example HTML page.                                                                              |
+| `PERCENTAGE_SCALE`          | `2`                             | The percentage reduction scale.                                                                                     |
 | `OPTIMIZE_IMAGE_SPRITES`    | `false`                         | Use `true` to optimize the image sprites, using the tinify API.                                                     |
 | `TINIFY_API_SHRINK_URL`     | `https://api.tinify.com/shrink` | The tinify API URL to compress the image. See https://tinypng.com/developers/reference                              |
 | `TINIFY_API_KEY`            |                                 | The tinify API key. Example: `api:ewp9orweoifuwerfjoaewsirfu9aw3eu`. Get your key on https://tinypng.com/developers |
