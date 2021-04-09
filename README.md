@@ -39,14 +39,14 @@ If necessary you can change the below variables. Pass it to the docker container
 | --------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `DEBUG_ENABLED`             | `false`                         | Use `true` to enable the debug mode                                                                                 |
 | `IMAGES_PATH_PATTERN`       | `src/*`                         | The images path pattern used to filter the images.                                                                  |
-| `IMAGE_FORMAT`              | `PNG8`                          | The sprite image format.                                                                                            |
+| `IMAGE_FORMAT`              | `PNG`                           | The sprite image format.                                                                                            |
 | `SPRITES_BASE_CLASS`        | `img`                           | The CSS class name of the base style.                                                                               |
 | `SPRITES_CLASS_PREFIX`      | `img-`                          | The CSS class name prefix of the image sprites.                                                                     |
 | `IMAGE_SPRITES_FILENAME`    | `sprite-result.png`             | The filename of the combined images.                                                                                |
 | `IMAGE_SPRITES_BASE_URL`    |                                 | The base URL of the image sprites.                                                                                  |
 | `STYLE_FILENAME`            | `style.css`                     | The CSS filename.                                                                                                   |
 | `EXAMPLE_FILENAME`          | `example.html`                  | The filename of the example HTML page.                                                                              |
-| `OPTIMIZE_SPRITES_IMAGE`    | `false`                         | Use `true` to optimize the image sprites, using the tinify API.                                                     |
+| `OPTIMIZE_IMAGE_SPRITES`    | `false`                         | Use `true` to optimize the image sprites, using the tinify API.                                                     |
 | `TINIFY_API_SHRINK_URL`     | `https://api.tinify.com/shrink` | The tinify API URL to compress the image. See https://tinypng.com/developers/reference                              |
 | `TINIFY_API_KEY`            |                                 | The tinify API key. Example: `api:ewp9orweoifuwerfjoaewsirfu9aw3eu`. Get your key on https://tinypng.com/developers |
 | `TINIFY_JSON_RESPONSE_FILE` | `tinify-response.json`          | The filename of the tinify shrink response.                                                                         |

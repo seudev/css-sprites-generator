@@ -33,7 +33,7 @@ convert $IMAGES_PATH_PATTERN -append $IMAGE_FORMAT:build/$IMAGE_SPRITES_FILENAME
 
 # optimize image sprites
 
-if [ "$OPTIMIZE_SPRITES_IMAGE" = "true" ]; then
+if [ "$OPTIMIZE_IMAGE_SPRITES" = "true" ]; then
 
     echo "[INFO] Optimizing image sprites..."
 
